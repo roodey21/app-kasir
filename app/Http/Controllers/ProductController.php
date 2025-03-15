@@ -41,7 +41,7 @@ class ProductController extends Controller
             ]);
         }
 
-        return redirect()->back()->with('success', 'Product created successfully.');
+        return redirect()->route('dashboard')->with('success', 'Product created successfully.');
     }
 
     /**
