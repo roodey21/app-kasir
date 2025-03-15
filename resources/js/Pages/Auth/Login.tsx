@@ -3,6 +3,7 @@ import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
+import { Button } from '@/Components/ui/button';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
@@ -38,6 +39,15 @@ export default function Login({
                 </div>
             )}
 
+            <div className="mb-4">
+                <h3 className="mb-2 text-lg font-semibold sm:text-xl md:text-3xl">
+                    Selamat Datang di MASPOS
+                </h3>
+                <p className="sm:text-lg">
+                    Masuk untuk mengelola bisnis Anda dengan mdah dan efisien. MASPOS menghadirkan solusi point-of-sale terbaik untuk kemudahan operasional sehari-hari
+                </p>
+            </div>
+
             <form onSubmit={submit}>
                 <div>
                     <InputLabel htmlFor="email" value="Email" />
@@ -47,7 +57,7 @@ export default function Login({
                         type="email"
                         name="email"
                         value={data.email}
-                        className="mt-1 block w-full"
+                        className="block w-full mt-1"
                         autoComplete="username"
                         isFocused={true}
                         onChange={(e) => setData('email', e.target.value)}
@@ -64,7 +74,7 @@ export default function Login({
                         type="password"
                         name="password"
                         value={data.password}
-                        className="mt-1 block w-full"
+                        className="block w-full mt-1"
                         autoComplete="current-password"
                         onChange={(e) => setData('password', e.target.value)}
                     />
@@ -72,7 +82,7 @@ export default function Login({
                     <InputError message={errors.password} className="mt-2" />
                 </div>
 
-                <div className="mt-4 block">
+                <div className="block mt-4">
                     <label className="flex items-center">
                         <Checkbox
                             name="remember"
@@ -84,25 +94,25 @@ export default function Login({
                                 )
                             }
                         />
-                        <span className="ms-2 text-sm text-gray-600 dark:text-gray-400">
+                        <span className="text-sm text-gray-600 ms-2 dark:text-gray-400">
                             Remember me
                         </span>
                     </label>
                 </div>
 
-                <div className="mt-4 flex items-center justify-end">
+                <div className="flex flex-col gap-2 mt-4">
+                    <Button className="" disabled={processing} size={"lg"}>
+                        Masuk
+                    </Button>
+
                     {canResetPassword && (
                         <Link
-                            href={route('password.request')}
-                            className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:text-gray-400 dark:hover:text-gray-100 dark:focus:ring-offset-gray-800"
+                            href={route('register')}
+                            className="text-sm text-gray-600 underline rounded-md hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:text-gray-400 dark:hover:text-gray-100 dark:focus:ring-offset-gray-800"
                         >
-                            Forgot your password?
+                            Tidak punya akun? Daftar disini
                         </Link>
                     )}
-
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Log in
-                    </PrimaryButton>
                 </div>
             </form>
         </GuestLayout>

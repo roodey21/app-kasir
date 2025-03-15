@@ -2,10 +2,17 @@ import ApplicationLogo from '@/Components/ApplicationLogo';
 import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
 import PrimaryButton from '@/Components/PrimaryButton';
+import FormCreate from '@/Components/product/form-create';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
-import { Button } from '@headlessui/react';
+import { Button } from '@/Components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/Components/ui/dialog';
+import { formatRupiah } from '@/helper/format';
+import useCartStore from '@/store/cart';
+import { CartItem, Product } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { PropsWithChildren, ReactNode, useState } from 'react';
+import { LogOut, Plus, Power, ShoppingCart } from 'lucide-react';
+import { PropsWithChildren, ReactNode, useEffect, useState } from 'react';
+import { toast, Toaster } from 'sonner';
 
 export default function Authenticated({
     header,
@@ -13,8 +20,28 @@ export default function Authenticated({
 }: PropsWithChildren<{ header?: ReactNode }>) {
     const user = usePage().props.auth.user;
 
-    const [showingNavigationDropdown, setShowingNavigationDropdown] =
-        useState(false);
+    const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
+
+    const cart = useCartStore((state) => state.cart);
+
+    const totalPrice = cart.reduce((acc: number, item: CartItem) => acc + item.price * item.qty, 0);
+
+    const totalQty = cart.reduce((acc: number, item: CartItem) => acc + item.qty, 0);
+
+    const { props } = usePage()
+
+    useEffect(() => {
+        if (props.flash.success) {
+            toast.success(props.flash.success);
+        }
+        if (props.flash.error) {
+            toast.error(props.flash.error);
+        }
+
+        if (props.errors.error) {
+            toast.error(props.errors.error);
+        }
+    }, [props.flash, props.errors]);
 
     return (
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
@@ -24,7 +51,10 @@ export default function Authenticated({
                         <div className="flex">
                             <div className="flex items-center shrink-0">
                                 <Link href="/">
-                                    <ApplicationLogo className="block w-auto text-gray-800 fill-current h-9 dark:text-gray-200" />
+                                    {/* <ApplicationLogo className="block w-auto text-gray-800 fill-current h-9 dark:text-gray-200" /> */}
+                                    <span className="text-3xl font-bold text-primary">
+                                        MASPOS
+                                    </span>
                                 </Link>
                             </div>
 
@@ -40,29 +70,34 @@ export default function Authenticated({
 
                         <div className="hidden sm:ms-6 sm:flex sm:items-center">
                             <div className="flex gap-4 h-min">
-                                <PrimaryButton className="flex flex-row gap-1">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-4">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                                    </svg>
-                                    Tambah Kategori
-                                </PrimaryButton>
-                                <PrimaryButton className="flex flex-row gap-1">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-4">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                                    </svg>
-                                    Tambah Produk
-                                </PrimaryButton>
+                                <Link href="/categories">
+                                    <Button variant="default">
+                                        <Plus />
+                                        Tambah Kategori
+                                    </Button>
+                                </Link>
+                                <Link href="/products">
+                                    <Button variant="default">
+                                        <Plus />
+                                        Tambah Produk
+                                    </Button>
+                                </Link>
 
-                                <div className='flex flex-row items-center bg-gray-200 rounded-md dark:bg-gray-600 dark:text-white'>
-                                    <PrimaryButton className="flex flex-row gap-1">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
-                                        </svg>
-                                    </PrimaryButton>
-                                    <div className="flex gap-1 px-3 price">
-                                        <span>Total tagihan</span>
-                                        <span className='font-semibold'>Rp 224.000</span>
-                                    </div>
+                                <div className='flex flex-row items-center rounded-md bg-primary-foreground dark:bg-gray-600 dark:text-white'>
+                                    <Link href="/cart">
+                                        <Button variant="default" className='relative'>
+                                            {cart?.length ? (
+                                                <span className='absolute right-0 p-0.5 px-1.5 text-xs -translate-y-full bg-green-500 rounded-full top-1/2'>{totalQty}</span>
+                                            ) : null}
+                                            <ShoppingCart />
+                                        </Button>
+                                    </Link>
+                                    {cart?.length ? (
+                                        <div className="flex items-center gap-1 px-3 text-sm price">
+                                            <span>Total tagihan</span>
+                                            <span className='font-semibold'>{formatRupiah(totalPrice)}</span>
+                                        </div>
+                                    ) : null}
                                 </div>
 
                             </div>
@@ -93,11 +128,11 @@ export default function Authenticated({
                                     </Dropdown.Trigger>
 
                                     <Dropdown.Content>
-                                        <Dropdown.Link
+                                        {/* <Dropdown.Link
                                             href={route('profile.edit')}
                                         >
                                             Profile
-                                        </Dropdown.Link>
+                                        </Dropdown.Link> */}
                                         <Dropdown.Link
                                             href={route('logout')}
                                             method="post"
@@ -111,6 +146,14 @@ export default function Authenticated({
                         </div>
 
                         <div className="flex items-center -me-2 sm:hidden">
+                            <Link href="/cart" className="me-2">
+                                <Button variant="default" className='relative'>
+                                    {cart?.length ? (
+                                        <span className='absolute right-0 p-0.5 px-1.5 text-xs -translate-y-full bg-green-500 rounded-full top-1/2'>{totalQty}</span>
+                                    ) : null}
+                                    <ShoppingCart />
+                                </Button>
+                            </Link>
                             <button
                                 onClick={() =>
                                     setShowingNavigationDropdown(
@@ -179,14 +222,24 @@ export default function Authenticated({
                         </div>
 
                         <div className="mt-3 space-y-1">
-                            <ResponsiveNavLink href={route('profile.edit')}>
+                            {/* <ResponsiveNavLink href={route('profile.edit')}>
                                 Profile
+                            </ResponsiveNavLink> */}
+                            <ResponsiveNavLink href={route('products.index')} className="flex flex-row items-center gap-2">
+                                <Plus className="w-4 h-4" />
+                                Tambah Produk
+                            </ResponsiveNavLink>
+                            <ResponsiveNavLink href={route('products.index')} className="flex flex-row items-center gap-2">
+                                <Plus className="w-4 h-4" />
+                                Tambah Kategori
                             </ResponsiveNavLink>
                             <ResponsiveNavLink
                                 method="post"
                                 href={route('logout')}
                                 as="button"
+                                className="flex flex-row items-center gap-2"
                             >
+                                <Power className="w-4 h-4" />
                                 Log Out
                             </ResponsiveNavLink>
                         </div>
@@ -203,6 +256,7 @@ export default function Authenticated({
             )}
 
             <main>{children}</main>
+            <Toaster position='top-right' className='!top-20'/>
         </div>
     );
 }
