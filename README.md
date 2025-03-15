@@ -43,6 +43,7 @@ To set up the application, follow these steps:
 5. Run the application:
    ```bash
    php artisan serve
+   npm run build
    ```
 
 6. Use the following credentials to log in:
